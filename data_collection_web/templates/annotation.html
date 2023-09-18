@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<br>
+    <div class="container">
+        <div class="box">
+            <form class="inline-form" method="post" action="{{ url_for('regenerate')}}">
+                <input class="btn" type="submit" name="regenerate" value="Regeneration">
+            </form>
+            <div class="content">
+            <p>{{data}}</p>
+            </div>
+        </div>
+        <form method="POST">
+            <button type="button" class="btn btn-secondary" onclick="addStep()">Add Step</button>
+            <button type="button" class="btn btn-secondary" onclick="removeStep()">Remove Step</button>
+            <input class="btn" type="submit" name="submit" value="Submit">
+            <br>
+            <br>
+            <div class="form-group">
+            <label>Action 1</label>
+            <br>
+            <select class="form-control" name="action1" required>
+                <option value="ADD">Add</option>
+                <option value="STIR">Stir</option>
+                <option value="YIELD">Yield</option>
+            </select>
+            <input type="text" name="reactant1" autocomplete="off" required>
+            <div id="steps"></div>
+        </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    function addStep() {
+      var steps = document.getElementById('steps');
+      var num = steps.children.length + 2;
+      var html = '<div class="form-group">' +
+                 '<label>Action ' + num +'</label>' +
+                 '<br>'+
+                  '<select id="select-option' + num + '" name="action' + num + '" required>' +
+                      '<option value="ADD">Add</option>' +
+                      '<option value="STIR">Stir</option>' +
+                      '<option value="YIELD">Yield</option>' +
+                  '</select> ' +
+                  '<input type="text" class="form-control" id="action' + num + '" name="reactant' + num + '" required>'+
+                  '</div>';
+      steps.insertAdjacentHTML('beforeend', html);
+    }
+
+    function removeStep() {
+      var steps = document.getElementById('steps');
+      if (steps.children.length > 0) {
+        steps.removeChild(steps.lastChild);
+      }
+    }
+  </script>
+{% endblock %}

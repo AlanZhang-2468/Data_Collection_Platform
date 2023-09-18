@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>
+    Welcome, {{ current_user.username }}!
+</h2>
+{% if current_user.is_authenticated %}
+<form method="post">
+    <a class="btn" href="{{ url_for('annotation')}}">Data Annotation</a>
+</form>
+{% endif %}
+<ul class="movie-list">
+    {% for reaction in reaction_list %}
+    <li>{{ reaction['reaction_id'] }}
+        <span class="float-right">
+            <a class="btn" href="{{ url_for('edit', reaction_id = reaction['reaction'].id) }}">Edit</a>
+            <form class="inline-form" method="post" action="{{ url_for('delete', reaction_id=reaction['reaction'].id) }}">
+                <input class="btn" type="submit" name="delete" value="Delete" onclick="return confirm('Are you sure?')">
+            </form>
+        </span>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

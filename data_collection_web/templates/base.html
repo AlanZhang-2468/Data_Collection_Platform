@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Collection Platform</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" type="text/css">
+    <script src="{{ url_for('static', filename='script.js') }}"></script> 
+    {% endblock %}
+</head>
+<body>
+    <h2>
+        <img alt="Avatar" class="avatar" src="{{ url_for('static', filename='images/avatar.png') }}">
+        Data Collection Platform
+    </h2>
+    <nav>
+        <ul>
+            {% if current_user.is_authenticated %}
+                <li><a href="{{ url_for('user_page', username = current_user.username) }}">Home</a></li>
+                <li><a href="{{ url_for('settings') }}">Settings</a></li>
+                <li><a href="{{ url_for('logout') }}">Sign out</a></li>
+            {% else %}
+                <li><a href="{{ url_for('home')}}">Home</a></li>
+                <li><a href="{{ url_for('login') }}">Sign in</a></li>
+                <li><a href="{{ url_for('register') }}">Sign up</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% block content %}{% endblock %}
+    {% block scripts %}{% endblock %}
+    <footer>
+        <small>&copy; 2023 <a href="hanyugao.com">Research Group of Hanyu Gao</a></small>
+    </footer>
+</body>
+</html>
+

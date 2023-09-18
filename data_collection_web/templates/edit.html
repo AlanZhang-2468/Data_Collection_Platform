@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<br>
+    <div class="container">
+        <div class="box">
+            <div class="content">
+            <p>{{reaction_text}}</p>
+            </div>
+        </div>
+        <form method="POST">
+            <button type="button" class="btn btn-secondary" onclick="addStep()">Add Step</button>
+            <button type="button" class="btn btn-secondary" onclick="removeStep()">Remove Step</button>
+            <input class="btn" type="submit" name="submit" value="Update">
+            <br>
+            <br>
+            <div id="steps">
+                {% for action in reaction_actions %}
+                <div class="form-group">
+                    <label>Step {{ loop.index }}</label>
+                    <br>
+                    <select class="form-control" name="action{{ loop.index }}" required>
+                        <option value="ADD" {% if action == 'ADD' %} selected {% endif %}> Add</option>
+                        <option value="STIR" {% if action == 'STIR' %} selected {% endif %}> Stir</option>
+                        <option value="YIELD" {% if action == 'YIELD' %} selected {% endif %}> Yield</option>
+                    </select>
+                    <input type="text" class="form-control" value="{{ reaction_smiles[loop.index-1] }}" name = "reactant{{ loop.index }}" required>
+                </div>
+                {% endfor %}
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    function addStep() {
+      var steps = document.getElementById('steps');
+      var num = steps.children.length + 1;
+      var html = '<div class="form-group">' +
+                 '  <label>Step ' + num +'</label>' +
+                 '  <br>' +
+                 '  <select class="form-control" name="action' + num + '" required>' +
+                 '      <option value="ADD">Add</option>' +
+                 '      <option value="STIR">Stir</option>' +
+                 '      <option value="YIELD">Yield</option>' +
+                 '  </select> ' +
+                 '  <input type="text" class="form-control" name="reactant' + num + '" required>'+
+                 '</div>';
+      steps.insertAdjacentHTML('beforeend', html);
+    }
+
+    function removeStep() {
+      var steps = document.getElementById('steps');
+      console.log("Before removing, total steps: ", steps.children.length);  // 调试信息
+      var before_length = steps.children.length;
+      if (steps.children.length > 0) {
+        steps.removeChild(steps.lastChild);
+      }
+      var after_length = steps.children.length;
+      if (before_length == after_length) {
+        steps.removeChild(steps.lastChild);
+      }
+      console.log("After removing, total steps: ", steps.children.length);  // 调试信息
+    }
+  </script>
+{% endblock %}
