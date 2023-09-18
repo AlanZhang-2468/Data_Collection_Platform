@@ -5,14 +5,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Collection Platform</title>
-    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="icon" href="{{ url_for('static', filename='biochemistry.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" type="text/css">
     <script src="{{ url_for('static', filename='script.js') }}"></script> 
     {% endblock %}
 </head>
 <body>
     <h2>
-        <img alt="Avatar" class="avatar" src="{{ url_for('static', filename='images/avatar.png') }}">
+        <img alt="Avatar" class="avatar" src="{{ url_for('static', filename='images/biochemistry.png') }}">
         Data Collection Platform
     </h2>
     <nav>
@@ -31,7 +31,7 @@
     {% block content %}{% endblock %}
     {% block scripts %}{% endblock %}
     <footer>
-        <small>&copy; 2023 <a href="hanyugao.com">Research Group of Hanyu Gao</a></small>
+        <small>&copy; 2023 <a href="https://hanyugao.com">Research Group of Hanyu Gao</a></small>
     </footer>
 </body>
 </html>

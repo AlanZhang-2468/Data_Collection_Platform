@@ -8,36 +8,35 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
 WIN = sys.platform.startswith('win')
-if WIN:  # 如果是 Windows 系统，使用三个斜线
+if WIN:  
     prefix = 'sqlite:///'
-else:  # 否则使用四个斜线
+else:  
     prefix = 'sqlite:////'
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = prefix + os.path.join(app.root_path, 'data.db')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # 关闭对模型修改的监控
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  
 app.config['SECRET_KEY'] = 'dev'
-# 在扩展类实例化前加载配置
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 
 @login_manager.user_loader
-def load_user(user_id):  # 创建用户加载回调函数，接受用户 ID 作为参数
-    user = User.query.get(int(user_id))  # 用 ID 作为 User 模型的主键查询对应的用户
+def load_user(user_id): 
+    user = User.query.get(int(user_id)) 
     return user  # 返回用户对象
 
 class User(db.Model, UserMixin):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20))
-    username = db.Column(db.String(20))  # 用户名
-    password_hash = db.Column(db.String(128))  # 密码散列值
+    username = db.Column(db.String(20)) 
+    password_hash = db.Column(db.String(128)) 
 
-    def set_password(self, password):  # 用来设置密码的方法，接受密码作为参数
-        self.password_hash = generate_password_hash(password)  # 将生成的密码保持到对应字段
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
 
-    def validate_password(self, password):  # 用于验证密码的方法，接受密码作为参数
-        return check_password_hash(self.password_hash, password)  # 返回布尔值
+    def validate_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
 class Reaction(db.Model):
     __tablename__ = 'reaction'
@@ -60,7 +59,7 @@ def annotation():
     index = np.random.randint(0, len(data))
     if request.method == 'POST':
         steps = []
-        for i in range(1, 1000):  # 假设最多有 1000 个反应步骤
+        for i in range(1, 1000):
             if 'action{}'.format(i) not in request.form:
                 break
             action = request.form['action{}'.format(i)]
@@ -75,16 +74,15 @@ def annotation():
         return redirect(url_for('user_page', username=current_user.username))
     return render_template('annotation.html', data=data[index])
 
-@app.route('/regenerate', methods=['POST'])  # 限定只接受 POST 请求
+@app.route('/regenerate', methods=['POST'])
 @login_required
 def regenerate():
-    return redirect(url_for('annotation'))  # 重定向回主页
+    return redirect(url_for('annotation'))
 
 @app.route('/user/<username>', methods=['GET', 'POST'])
 @login_required
 def user_page(username):
     if current_user.username != username:
-        # 如果当前用户不是请求的用户，则重定向到当前用户的页面
         return redirect(url_for('user_page', username=current_user.username))
     user = User.query.filter_by(username=username).first_or_404()
     reaction = Reaction.query.filter_by(user_id=user.id).all()
@@ -96,7 +94,6 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        # if len(User.query.all()) != 0:
         user = User.query.filter_by(username=username).first()
         if user:
             flash('Username already exists')
@@ -123,32 +120,31 @@ def login():
 
         users = User.query.all()
         for user in users:
-            # 验证用户名和密码是否一致
             if username == user.username and user.validate_password(password):
-                login_user(user)  # 登入用户
+                login_user(user) 
                 flash('Login success.')
-                return redirect(url_for('user_page', username=username))  # 重定向到主页
+                return redirect(url_for('user_page', username=username))
 
-        flash('Invalid username or password.')  # 如果验证失败，显示错误消息
-        return redirect(url_for('login'))  # 重定向回登录页面
+        flash('Invalid username or password.') 
+        return redirect(url_for('login'))
 
     return render_template('login.html')
 
-@app.cli.command()  # 注册为命令，可以传入 name 参数来自定义命令
-@click.option('--drop', is_flag=True, help='Create after drop.')  # 设置选项
+@app.cli.command() 
+@click.option('--drop', is_flag=True, help='Create after drop.') 
 def initdb(drop):
     """Initialize the database."""
-    if drop:  # 判断是否输入了选项
+    if drop:  
         db.drop_all()
     db.create_all()
-    click.echo('Initialized database.')  # 输出提示信息
+    click.echo('Initialized database.') 
 
 @app.route('/logout')
-@login_required  # 用于视图保护，后面会详细介绍
+@login_required 
 def logout():
-    logout_user()  # 登出用户
+    logout_user() 
     flash('Goodbye.')
-    return redirect(url_for('home'))  # 重定向回首页
+    return redirect(url_for('home')) 
 
 @app.route('/settings', methods=['GET', 'POST'])
 @login_required
@@ -161,10 +157,6 @@ def settings():
             return redirect(url_for('settings'))
 
         current_user.name = name
-        # current_user 会返回当前登录用户的数据库记录对象
-        # 等同于下面的用法
-        # user = User.query.first()
-        # user.name = name
         db.session.commit()
         flash('Settings updated.')
         return redirect(url_for('home'))
@@ -182,7 +174,7 @@ def edit(reaction_id):
     
     if request.method == 'POST':
         steps = []
-        for i in range(1, 1000):  # 假设最多有 1000 个反应步骤
+        for i in range(1, 1000): 
             if 'action{}'.format(i) not in request.form:
                 break
             action = request.form['action{}'.format(i)]
@@ -200,15 +192,15 @@ def edit(reaction_id):
         'edit.html', 
         reaction_text = reaction_text,
         reaction_actions = reaction_actions,
-        reaction_smiles = reaction_smiles)  # 传入被编辑的电影记录
+        reaction_smiles = reaction_smiles)
 
-@app.route('/reaction/delete/<int:reaction_id>', methods=['POST'])  # 限定只接受 POST 请求
+@app.route('/reaction/delete/<int:reaction_id>', methods=['POST'])  
 @login_required
 def delete(reaction_id):
-    reaction = Reaction.query.get_or_404(reaction_id)  # 获取电影记录
-    db.session.delete(reaction)  # 删除对应的记录
-    db.session.commit()  # 提交数据库会话
+    reaction = Reaction.query.get_or_404(reaction_id)
+    db.session.delete(reaction) 
+    db.session.commit() 
     flash('Item deleted.')
-    return redirect(url_for('user_page', username=current_user.username))  # 重定向回主页
+    return redirect(url_for('user_page', username=current_user.username))
 
 

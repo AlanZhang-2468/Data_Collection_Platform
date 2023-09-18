@@ -129,7 +129,7 @@ def edit(reaction_id):
     
     if request.method == 'POST':
         steps = []
-        for i in range(1, 1000):  # 假设最多有 1000 个反应步骤
+        for i in range(1, 1000): 
             if 'action{}'.format(i) not in request.form:
                 break
             action = request.form['action{}'.format(i)]
@@ -147,13 +147,12 @@ def edit(reaction_id):
         'edit.html', 
         reaction_text = reaction_text,
         reaction_actions = reaction_actions,
-        reaction_smiles = reaction_smiles)  # 传入被编辑的电影记录
-
-@app.route('/reaction/delete/<int:reaction_id>', methods=['POST'])  # 限定只接受 POST 请求
+        reaction_smiles = reaction_smiles) 
+@app.route('/reaction/delete/<int:reaction_id>', methods=['POST'])
 @login_required
 def delete(reaction_id):
-    reaction = Reaction.query.get_or_404(reaction_id)  # 获取电影记录
-    db.session.delete(reaction)  # 删除对应的记录
-    db.session.commit()  # 提交数据库会话
+    reaction = Reaction.query.get_or_404(reaction_id) 
+    db.session.delete(reaction) 
+    db.session.commit() 
     flash('Item deleted.')
-    return redirect(url_for('user_page', username=current_user.username))  # 重定向回主页
+    return redirect(url_for('user_page', username=current_user.username))  
